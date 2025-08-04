@@ -1,4 +1,16 @@
 
-*.class
+*
 
-/lib/
+!.gitignore
+!src/
+!employees.csv
+!notes.txt
+
+*.class
+/out/
+/bin/
+
+
+.idea/
+*.iml
+.vscode/
