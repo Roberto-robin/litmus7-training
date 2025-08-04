@@ -1,0 +1,11 @@
+    we introduce a new file called EmployeeManagerService to implement the actual functional logics 
+# basically whats happenning is we are treating our system as imagine a lobby where the variables/requests/etc are recieved and the the functionalities are implemeted such as over here whats happening is we get a request at the EmployeeManagerController wher the data will undergo step 1 validation and the rest of the function is implemented in the service class
+now thing to consider is that we return the status coddes with the help if a response class.
+
+    Need to implement all the business functionalities over here 
+    such as - Read csv 
+    load data
+    vallidate data
+    load into 
+    + any other functions 
+    
