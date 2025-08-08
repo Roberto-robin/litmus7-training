@@ -13,3 +13,14 @@
 .idea/
 *.iml
 .vscode/
+
+
+/target/
+
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+mvnw
+mvnw.cmd
+
+
+*.log
