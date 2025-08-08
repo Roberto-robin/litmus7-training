@@ -1,4 +1,4 @@
-package com.litmus7.java_emp_mgt.response;
+package com.litmus7.response;
 
 public class StatusCode<A , B> {
         public final A first;

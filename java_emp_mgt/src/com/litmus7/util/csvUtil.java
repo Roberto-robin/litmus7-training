@@ -1,4 +1,4 @@
-package com.litmus7.java_emp_mgt.util;
+package com.litmus7.util;
 import java.io.File;
 public class csvUtil {
     public static boolean checkCSV(String filePath){

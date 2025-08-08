@@ -1,4 +1,4 @@
-package com.litmus7.java_emp_mgt.dto;
+package com.litmus7.dto;
 public class Employee {
     private int empId;
     private String firstName;
@@ -31,4 +31,10 @@ public class Employee {
     public String getDepartment() { return department; }
     public double getSalary() { return salary; }
     public String getJoinDate() { return joinDate; }
+
+
+    public String details(){
+         return "Employee : " + "emp_id=" + empId + ", first_name = '" + firstName + '\'' + ", last_name = '" + lastName + '\'' + ", email = '" + email + '\'' +", phone ='" + phone + '\'' +", department = '" + department + '\'' +", salary = " + salary +", join_date = '" + joinDate + '\'';
+
+    }
 }

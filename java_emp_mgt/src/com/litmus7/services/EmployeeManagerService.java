@@ -1,7 +1,14 @@
-package com.litmus7.java_emp_mgt.services;
+package com.litmus7.services;
 
-import com.litmus7.java_emp_mgt.controller.EmployeeManagerController; 
-import com.litmus7.java_emp_mgt.util.*; 
+import com.litmus7.controller.EmployeeManagerController; 
+import com.litmus7.util.csvUtil; 
+import com.litmus7.dto.Employee;
+import com.litmus7.util.ValidationUtil;
+import com.litmus7.util.dbUtil;
+import com.litmus7.dao.EmployeeDao;
+
+
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -21,7 +28,7 @@ public class EmployeeManagerService {
             reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 String[] data = line.split(",");
                 if (data.length != 8) {
                     System.out.println(data.length);
@@ -42,23 +49,21 @@ public class EmployeeManagerService {
             }
             reader.close();
         } catch (Exception e) {
-            System.out.println("Error reading CSV: " + e.getMessage());
+            System.out.println("Error reading CSV: ivalid field type " + e.getMessage());
         }
-        return employees;
+    
+            return employees;
     }
 
     public boolean employeeExists(Connection conn, int empId) {
-        try (PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) FROM employee WHERE emp_id = ?")) {
-            pstmt.setInt(1, empId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
+        EmployeeDao daofunction = new EmployeeDao();
+        boolean exists = false;
+        try{
+             exists = daofunction.employeeExists(conn, empId);
         } catch (Exception e) {
             System.out.println("Error checking duplicate: " + e.getMessage());
         }
-        return false;
+            return exists;
     }
 
     private boolean isValidEmployee(Employee emp) {
@@ -68,34 +73,14 @@ public class EmployeeManagerService {
                 && ValidationUtil.isValidJoinDate(emp.getJoinDate());
     }
 
-    public void writeToDB(Connection conn, List<Employee> employees) {
-        try {
-            Statement stmt = conn.createStatement();
-            for (Employee emp : employees) {
-              
-                if (employeeExists(conn, emp.getEmpId())) {
-                    System.out.println("Skipping duplicate empId: " + emp.getEmpId());
-                    continue;
-                }
-                String query = String.format(
-                        "INSERT INTO employee VALUES (%d, '%s', '%s', '%s', '%s', '%s', %.2f, '%s')",
-                        emp.getEmpId(), emp.getFirstName(), emp.getLastName(), emp.getEmail(),
-                        emp.getPhone(), emp.getDepartment(), emp.getSalary(), emp.getJoinDate());
-                stmt.executeUpdate(query);
-                System.out.println("Inserted: " + emp.getEmpId());
-
-            }
-            stmt.close();
-        } catch (Exception e) {
-            System.out.println("Error writing to DB: " + e.getMessage());
-        }
-    }
+    
 
     public void writeDataToDB(String csvPath) {
+        EmployeeDao daofunc = new EmployeeDao();
         List<Employee> employeeList = readCSV(csvPath);
         Connection conn = dbUtil.getConnection();
         if (conn != null) {
-            writeToDB(conn, employeeList);
+            daofunc.writeToDB(conn, employeeList);
             try {
                 conn.close();
             } catch (Exception e) {
@@ -104,4 +89,35 @@ public class EmployeeManagerService {
         }
     }
 
+    public Employee getEmployeeDetails(Integer id)
+    {
+        boolean status = false;
+        EmployeeDao daofunc = new EmployeeDao();
+        Connection conn = dbUtil.getConnection();
+        Employee emp = null;
+        if(conn!=null)
+        {
+            try{
+                emp = daofunc.getEmployeeDetails(conn,id);
+                status = true;
+            }
+            catch(Exception e)
+            {
+                System.out.println("there is a problem with dao function"+e.getMessage());
+            }
+        }
+        return emp;
+
+    }
+
+    public Employee updateEmployeeDetails(Integer empId, String field)
+    {
+        Connection conn = dbUtil.getConnection();
+        EmployeeDao daofunc = new EmployeeDao();
+        Employee emp = daofunc.updateEmployeeDetails(conn,empId,field);
+        return emp;
+
+
+    }
 }
+

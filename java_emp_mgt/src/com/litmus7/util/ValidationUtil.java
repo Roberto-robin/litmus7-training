@@ -1,4 +1,4 @@
-package com.litmus7.java_emp_mgt.util;
+package com.litmus7.util;
 import java.util.regex.Pattern;
 
 public class ValidationUtil {
