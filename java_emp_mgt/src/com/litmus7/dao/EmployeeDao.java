@@ -15,29 +15,45 @@ import com.litmus7.services.EmployeeManagerService;
 public class EmployeeDao {
 
     public void writeToDB(Connection conn, List<Employee> employees) {
-        try {
-            EmployeeManagerService service = new EmployeeManagerService();
-            Statement stmt = conn.createStatement();
-            for (Employee emp : employees) {
-
-                if (service.employeeExists(conn, emp.getEmpId())) {
-                    System.out.println("Skipping duplicate empId: " + emp.getEmpId());
-                    continue;
-                }
-                String query = String.format(
-                        "INSERT INTO employee VALUES (%d, '%s', '%s', '%s', '%s', '%s', %.2f, '%s')",
-                        emp.getEmpId(), emp.getFirstName(), emp.getLastName(), emp.getEmail(),
-                        emp.getPhone(), emp.getDepartment(), emp.getSalary(), emp.getJoinDate());
-                stmt.executeUpdate(query);
-                System.out.println("Inserted: " + emp.getEmpId());
-
+    String insertQuery = "INSERT INTO employee (emp_id, first_name, last_name, email, phone, department, salary, join_date) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+        
+        EmployeeManagerService service = new EmployeeManagerService();
+        
+        for (Employee emp : employees) {
+            
+            // Skip if duplicate
+            if (service.employeeExists(conn, emp.getEmpId())) {
+                System.out.println("Skipping duplicate empId: " + emp.getEmpId());
+                continue;
             }
-            stmt.close();
+            
+            // Set parameters
+            pstmt.setInt(1, emp.getEmpId());
+            pstmt.setString(2, emp.getFirstName());
+            pstmt.setString(3, emp.getLastName());
+            pstmt.setString(4, emp.getEmail());
+            pstmt.setString(5, emp.getPhone());
+            pstmt.setString(6, emp.getDepartment());
+            pstmt.setDouble(7, emp.getSalary());
+            pstmt.setDate(8, java.sql.Date.valueOf(emp.getJoinDate())); // must be "YYYY-MM-DD"
+
+            pstmt.executeUpdate();
+            System.out.println("Inserted: " + emp.getEmpId());
+        }
+        
+    } catch (Exception e) {
+        System.out.println("Error writing to DB: " + e.getMessage());
+    } finally {
+        try {
             conn.close();
         } catch (Exception e) {
-            System.out.println("Error writing to DB: " + e.getMessage());
+            System.out.println("Error closing connection: " + e.getMessage());
         }
     }
+}
+
 
     public boolean employeeExists(Connection conn, int empId) {
         try (PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) FROM employee WHERE emp_id = ?")) {
@@ -132,4 +148,61 @@ public class EmployeeDao {
 
     return emp;
     }
+
+    public boolean deleteEmployeeDetails(Integer empId)
+    {
+
+        Connection conn = dbUtil.getConnection();
+        String query = "DELETE FROM employee WHERE emp_id = ?";
+        boolean result = false;
+        try(PreparedStatement pstmt = conn.prepareStatement(query))
+        {
+            pstmt.setInt(1,empId);
+            int rowsAffected = pstmt.executeUpdate();
+            if(rowsAffected>0)
+            {
+                result = true;
+            }
+        }
+        catch(Exception e )
+        {
+            System.out.println("error connecting to db"+e.getMessage());
+        }
+        return result;
+
+    }
+
+    public boolean addEmployee(Employee emp)
+    {
+        Connection conn = dbUtil.getConnection();
+        boolean result = false;
+        String insertQuery = "INSERT INTO employee (emp_id, first_name, last_name, email, phone, department, salary, join_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(insertQuery))
+        {
+            pstmt.setInt(1, emp.getEmpId());
+            pstmt.setString(2, emp.getFirstName());
+            pstmt.setString(3, emp.getLastName());
+            pstmt.setString(4, emp.getEmail());
+            pstmt.setString(5, emp.getPhone());
+            pstmt.setString(6, emp.getDepartment());
+            pstmt.setDouble(7, emp.getSalary());
+            pstmt.setDate(8, java.sql.Date.valueOf(emp.getJoinDate()));
+
+            pstmt.executeUpdate();
+            System.out.println("Inserted: " + emp.getEmpId());
+            conn.close();
+            result =true;
+
+        }
+        catch(Exception e)
+        {
+            System.out.println("Error :"+e.getMessage());
+        }
+        return result;
+      
+    }
+
+
+
+
 }

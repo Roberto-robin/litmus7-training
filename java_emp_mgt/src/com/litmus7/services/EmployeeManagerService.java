@@ -1,13 +1,11 @@
 package com.litmus7.services;
 
-import com.litmus7.controller.EmployeeManagerController; 
-import com.litmus7.util.csvUtil; 
+import com.litmus7.controller.EmployeeManagerController;
+import com.litmus7.util.csvUtil;
 import com.litmus7.dto.Employee;
 import com.litmus7.util.ValidationUtil;
 import com.litmus7.util.dbUtil;
 import com.litmus7.dao.EmployeeDao;
-
-
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class EmployeeManagerService {
 
@@ -28,7 +27,7 @@ public class EmployeeManagerService {
             reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
+                // System.out.println(line);
                 String[] data = line.split(",");
                 if (data.length != 8) {
                     System.out.println(data.length);
@@ -51,19 +50,19 @@ public class EmployeeManagerService {
         } catch (Exception e) {
             System.out.println("Error reading CSV: ivalid field type " + e.getMessage());
         }
-    
-            return employees;
+
+        return employees;
     }
 
     public boolean employeeExists(Connection conn, int empId) {
         EmployeeDao daofunction = new EmployeeDao();
         boolean exists = false;
-        try{
-             exists = daofunction.employeeExists(conn, empId);
+        try {
+            exists = daofunction.employeeExists(conn, empId);
         } catch (Exception e) {
             System.out.println("Error checking duplicate: " + e.getMessage());
         }
-            return exists;
+        return exists;
     }
 
     private boolean isValidEmployee(Employee emp) {
@@ -72,8 +71,6 @@ public class EmployeeManagerService {
                 && ValidationUtil.isValidPhone(emp.getPhone())
                 && ValidationUtil.isValidJoinDate(emp.getJoinDate());
     }
-
-    
 
     public void writeDataToDB(String csvPath) {
         EmployeeDao daofunc = new EmployeeDao();
@@ -89,35 +86,97 @@ public class EmployeeManagerService {
         }
     }
 
-    public Employee getEmployeeDetails(Integer id)
-    {
+    public Employee getEmployeeDetails(Integer id) {
         boolean status = false;
         EmployeeDao daofunc = new EmployeeDao();
         Connection conn = dbUtil.getConnection();
         Employee emp = null;
-        if(conn!=null)
-        {
-            try{
-                emp = daofunc.getEmployeeDetails(conn,id);
+        if (conn != null) {
+            try {
+                emp = daofunc.getEmployeeDetails(conn, id);
                 status = true;
-            }
-            catch(Exception e)
-            {
-                System.out.println("there is a problem with dao function"+e.getMessage());
+            } catch (Exception e) {
+                System.out.println("there is a problem with dao function" + e.getMessage());
             }
         }
         return emp;
 
     }
 
-    public Employee updateEmployeeDetails(Integer empId, String field)
-    {
+    public Employee updateEmployeeDetails(Integer empId, String field) {
         Connection conn = dbUtil.getConnection();
         EmployeeDao daofunc = new EmployeeDao();
-        Employee emp = daofunc.updateEmployeeDetails(conn,empId,field);
+        Employee emp = daofunc.updateEmployeeDetails(conn, empId, field);
         return emp;
 
+    }
+
+    public boolean deleteEmployeeDetails(Integer empId) {
+        EmployeeDao daofunc = new EmployeeDao();
+        boolean effect = daofunc.deleteEmployeeDetails(empId);
+        return effect;
 
     }
-}
 
+    public boolean addEmployee() {
+
+        EmployeeDao daofunc = new EmployeeDao();
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter emmployee details in followiing order\n");
+        System.out.println("Employee id");
+        Integer empId = sc.nextInt();
+        sc.nextLine();
+        boolean result = false;
+        if (!employeeExists(dbUtil.getConnection(), empId)) {
+            System.out.print("first_name: ");
+            String fname = sc.nextLine();
+
+            System.out.print("\nlast_name: ");
+            String lname = sc.nextLine();
+
+            System.out.print("\nemail : ");
+            String email = sc.nextLine();
+            result = ValidationUtil.isValidEmail(email);
+            if (result == false){
+                System.out.println("INVALID EMAIL !");
+                return result;
+            }
+            System.out.print("\nphone no: ");
+            String pnumber = sc.nextLine();
+            result = ValidationUtil.isValidPhone(pnumber);
+            if (result == false){
+                System.out.println("INVALID PHONE NUMBER !");
+                return result;
+            }
+
+            System.out.print("\ndepartment: ");
+            String department = sc.nextLine();
+
+            System.out.print("\nSalary: ");
+            double salary = sc.nextDouble();
+            result = ValidationUtil.isValidSalary(salary);
+            if (result == false){
+                System.out.println("INVALID SALARY !");
+                return result;
+            }
+            sc.nextLine();
+
+            System.out.print("\njoin_date(yyyy-mm-dd): ");
+            String dateStr = sc.nextLine();
+            result = ValidationUtil.isValidJoinDate(dateStr);
+            if (result == false){
+                System.out.println("INVALID JOINING DATE !");
+                return result;
+            }
+            Employee emp = new Employee(empId, fname, lname, email, pnumber, department, salary, dateStr);
+
+            result = daofunc.addEmployee(emp);
+        } 
+        else {
+            System.out.println("Error : employee id already present");
+        }
+        return result;
+
+    }
+
+}

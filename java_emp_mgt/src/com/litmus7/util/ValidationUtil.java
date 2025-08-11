@@ -21,7 +21,23 @@ public class ValidationUtil {
 
     public static boolean isValidJoinDate(String date) 
     {
-        return date != null && DATE_PATTERN.matcher(date).matches();
+        if (date == null || !DATE_PATTERN.matcher(date).matches()) 
+        return false;
+        try 
+        {
+            java.sql.Date.valueOf(date); 
+            return true;
+        } 
+        catch (IllegalArgumentException e) 
+        {
+            return false;
+        }
     }
+
+    public static boolean isValidSalary(double salary) 
+    {
+        return salary > 0;
+    }
+
 
 }

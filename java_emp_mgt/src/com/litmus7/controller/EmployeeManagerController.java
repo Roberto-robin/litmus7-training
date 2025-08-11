@@ -85,11 +85,33 @@ public class EmployeeManagerController {
     
     }
 
+    public boolean deleteEmployeeDetails(Integer empId)
+    {
+        boolean status = false;
+        if(emps.employeeExists(dbUtil.getConnection(), empId))
+        {
+            status = emps.deleteEmployeeDetails(empId);
+        }
+        else{
+            System.out.println("Error : Employee details not found !");
+        }
+        if(status==true)
+        System.out.println("Employee details succesfully deleted");
+        return status;
+    }
 
-
-
-
+    public  StatusCode<Integer , String> addEmployee()
+    {
+        boolean result = emps.addEmployee();
+        if(result==true) 
+           return new StatusCode(20, "Sucess");
+        else
+           return new StatusCode(406,"Error adding employee to db");
+    }
+   
 }
+
+
 
 
 

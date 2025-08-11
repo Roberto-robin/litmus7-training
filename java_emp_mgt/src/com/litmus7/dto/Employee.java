@@ -1,4 +1,7 @@
 package com.litmus7.dto;
+
+import java.sql.Date;
+
 public class Employee {
     private int empId;
     private String firstName;
@@ -11,7 +14,7 @@ public class Employee {
 
     // Constructor
     public Employee(int empId, String firstName, String lastName, String email,
-                    String phone, String department, double salary, String joinDate) {
+                    String phone, String department, double salary, String dateStr) {
         this.empId = empId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -19,7 +22,7 @@ public class Employee {
         this.phone = phone;
         this.department = department;
         this.salary = salary;
-        this.joinDate = joinDate;
+        this.joinDate = dateStr;
     }
 
     // Getters
