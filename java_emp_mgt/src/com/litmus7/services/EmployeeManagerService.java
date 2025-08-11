@@ -137,14 +137,14 @@ public class EmployeeManagerService {
             System.out.print("\nemail : ");
             String email = sc.nextLine();
             result = ValidationUtil.isValidEmail(email);
-            if (result == false){
+            if (!result){
                 System.out.println("INVALID EMAIL !");
                 return result;
             }
             System.out.print("\nphone no: ");
             String pnumber = sc.nextLine();
             result = ValidationUtil.isValidPhone(pnumber);
-            if (result == false){
+            if (!result){
                 System.out.println("INVALID PHONE NUMBER !");
                 return result;
             }
@@ -155,7 +155,7 @@ public class EmployeeManagerService {
             System.out.print("\nSalary: ");
             double salary = sc.nextDouble();
             result = ValidationUtil.isValidSalary(salary);
-            if (result == false){
+            if (!result){
                 System.out.println("INVALID SALARY !");
                 return result;
             }
@@ -164,7 +164,7 @@ public class EmployeeManagerService {
             System.out.print("\njoin_date(yyyy-mm-dd): ");
             String dateStr = sc.nextLine();
             result = ValidationUtil.isValidJoinDate(dateStr);
-            if (result == false){
+            if (!result){
                 System.out.println("INVALID JOINING DATE !");
                 return result;
             }
@@ -179,4 +179,37 @@ public class EmployeeManagerService {
 
     }
 
+    public void addEmployeesInBatch(List<Employee> employeeList) {
+    EmployeeDao daofunc = new EmployeeDao();
+    int[] results = daofunc.addEmployeesInBatch(employeeList);
+    int successCount = 0;
+    int failCount = 0;
+
+    for (int i = 0; i < results.length; i++) {
+        if (results[i] >= 0) {
+            successCount++;
+        } else 
+        { 
+            failCount++;
+            System.err.println("Failed to insert Employee with ID: " + employeeList.get(i).getEmpId());
+        }
+    }
+
+    System.out.println("Batch insert complete: \nTotal added = " + successCount + ", Total failed = " + failCount);
 }
+
+
+
+    public void transferEmployeesToDepartment(List<Integer> empIds, String newDepartment) {
+        EmployeeDao dao = new EmployeeDao();
+        boolean success = dao.transferEmployeesToDepartment(empIds, newDepartment);
+
+        if (success) {
+            System.out.println("All employees successfully transferred to department: " + newDepartment);
+        } else {
+            System.out.println("Transfer failed. No changes were made.");
+        }
+    }
+}
+
+

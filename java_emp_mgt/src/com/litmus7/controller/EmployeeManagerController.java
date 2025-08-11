@@ -5,9 +5,13 @@ import com.litmus7.response.StatusCode;
 import com.litmus7.util.csvUtil;
 import com.litmus7.util.dbUtil;
 import com.litmus7.dto.Employee;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import java.sql.Connection;
+import java.time.LocalDate;
 
 public class EmployeeManagerController {
 
@@ -108,6 +112,74 @@ public class EmployeeManagerController {
         else
            return new StatusCode(406,"Error adding employee to db");
     }
+
+    public void addEmployeesInBatch() {
+    Scanner sc = new Scanner(System.in);
+    List<Employee> employees = new ArrayList<>();
+
+    System.out.print("Enter number of employees to insert in batch: ");
+    int count = Integer.parseInt(sc.nextLine());
+
+    for (int i = 0; i < count; i++) {
+        System.out.println("\nEnter details for Employee " + (i + 1));
+
+        System.out.print("Employee ID: ");
+        int empId = Integer.parseInt(sc.nextLine());
+
+        System.out.print("First Name: ");
+        String firstName = sc.nextLine();
+
+        System.out.print("Last Name: ");
+        String lastName = sc.nextLine();
+
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+
+        System.out.print("Phone: ");
+        String phone = sc.nextLine();
+
+        System.out.print("Department: ");
+        String department = sc.nextLine();
+
+        System.out.print("Salary: ");
+        double salary = Double.parseDouble(sc.nextLine());
+
+        System.out.print("Join Date (YYYY-MM-DD): ");
+        String joinDate = sc.nextLine();
+
+        employees.add(new Employee(empId, firstName, lastName, email, phone, department, salary, joinDate));
+    }
+    emps.addEmployeesInBatch(employees);
+}
+
+
+public void transferEmployeesToDepartment() { 
+    Scanner sc = new Scanner(System.in);
+
+    System.out.print("Enter number of employees to update: ");
+    int count = sc.nextInt();
+    sc.nextLine();
+
+    List<Integer> empIds = new ArrayList<>();
+    System.out.print("Enter Employee IDs : ");
+    for (int i = 0; i < count; i++) {
+        empIds.add(sc.nextInt());
+        sc.nextLine(); 
+    }
+
+    System.out.print("Enter new department for all employees: ");
+    String newDepartment = sc.nextLine().trim();
+    emps.transferEmployeesToDepartment(empIds, newDepartment);
+}
+
+
+
+
+
+
+
+
+
    
 }
 
